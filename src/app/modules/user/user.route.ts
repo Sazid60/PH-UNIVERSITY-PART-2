@@ -1,12 +1,14 @@
-import express, { NextFunction, Request, Response } from 'express';
+import express from 'express';
 import { UserController } from './user.controller';
+import { createStudentValidationSchema } from '../students/student.validation';
+import validateRequest from '../../middlewares/validateRequest';
 
 const router = express.Router();
 
-const senaBahini = (req: Request, res: Response, next: NextFunction) => {
-  console.log(req.body);
-  next();
-};
-router.post('/create-student', senaBahini, UserController.createStudent);
+router.post(
+  '/create-student',
+  validateRequest(createStudentValidationSchema),
+  UserController.createStudent,
+);
 
 export const userRoutes = router;

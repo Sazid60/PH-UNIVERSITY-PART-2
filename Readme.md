@@ -68,3 +68,96 @@ export const userRoutes = router;
 ```
 
 - we will get the data in the body we will validate data inside the middleware and we will return error from the middleware if any kind of error happens
+
+## 12-3 Implement validateRequest Middleware
+
+- making the middleware function higher order
+
+```ts
+import express, { NextFunction, Request, Response } from 'express';
+import { UserController } from './user.controller';
+
+const router = express.Router();
+
+//  this is made higher order function
+const senaBahini = (name) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    // console.log(req.body);
+    console.log(`I am ${name} senabahini`);
+
+    //   validation
+    next();
+  };
+};
+
+router.post(
+  '/create-student',
+  senaBahini('ValidateRequest'),
+  UserController.createStudent,
+);
+
+export const userRoutes = router;
+```
+
+- we have to take care of the data how we are sending and how we are dealing
+
+```ts
+import express, { NextFunction, Request, Response } from 'express';
+import { UserController } from './user.controller';
+import { AnyZodObject } from 'zod';
+import { studentValidationSchema } from '../students/student.validation';
+
+const router = express.Router();
+
+//  this is made higher order function
+const validateRequest = (schema: AnyZodObject) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      //   validation using zod
+      // if everything alright next()
+      await schema.parseAsync({
+        body: req.body,
+        //    as it is kept inside a body zod must be kept inside a body
+      });
+      next();
+    } catch (err) {
+      next(err);
+    }
+  };
+};
+
+router.post(
+  '/create-student',
+  validateRequest(studentValidationSchema),
+  UserController.createStudent,
+);
+
+export const userRoutes = router;
+```
+
+- zod needs change as well
+
+```ts
+export const studentValidationSchema = z.object({
+  body: z.object({
+    password: z.string().max(20),
+
+    student: z.object({
+      name: userNameValidationSchema,
+      gender: z.enum(['male', 'female', 'other']),
+      dateOfBirth: z.string(),
+      email: z.string().email(),
+      contactNo: z.string(),
+      emergencyContactNo: z.string(),
+      bloodGroup: z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']),
+      presentAddress: z.string(),
+      permanentAddress: z.string(),
+      guardian: guardianValidationSchema,
+      localGuardian: localGuardianValidationSchema,
+      profileImg: z.string(),
+    }),
+  }),
+});
+```
+
+- Though we will make separate middleware for this
