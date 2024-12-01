@@ -224,3 +224,28 @@ export const AcademicSemesterServices = {
   createAcademicSemesterIntoDB,
 };
 ```
+
+![alt text](<WhatsApp Image 2024-12-01 at 21.54.39_e2e7fbd0.jpg>)
+
+- This padStart means how many digits it want
+
+```ts
+const currentId = (0).toString().padStart(4, '0');
+```
+
+- creating a dynamic incremental id
+
+```ts
+// auto generate id
+
+import { TAcademicSemester } from '../academicSemester/academicSemester.interface';
+
+// -->year->semester->4 digit number
+export const generateStudentId = (payload: TAcademicSemester) => {
+  const currentId = (0).toString();
+  let incrementId = (Number(currentId) + 1).toString().padStart(4, '0');
+
+  incrementId = `${payload.year}${payload.code}${incrementId}`;
+  return incrementId;
+};
+```

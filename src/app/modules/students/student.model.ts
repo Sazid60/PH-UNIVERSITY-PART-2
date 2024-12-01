@@ -117,7 +117,7 @@ const studentSchema = new Schema<TStudent, StudentModel>(
     },
 
     dateOfBirth: {
-      type: Date,
+      type: String,
       required: [true, 'Date of Birth is Required'],
     },
 
@@ -180,6 +180,10 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       type: String,
     },
 
+    admissionSemester: {
+      type: Schema.Types.ObjectId,
+      ref: 'AcademicSemester',
+    },
     isDeleted: {
       type: Boolean,
       default: false,
