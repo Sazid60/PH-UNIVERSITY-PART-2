@@ -165,3 +165,62 @@ export const studentValidationSchema = z.object({
 ## 12-4 Create Academic Semester Interface
 
 ![alt text](image-1.png)
+
+## 12-8 Handle Logical Validation of Academic Semester
+
+- common work it written in model
+
+```ts
+//As it is a common work it is written in model
+academicSemesterSchema.pre('save', async function (next) {
+  const isSemesterExists = await AcademicSemester.findOne({
+    year: this.year,
+    name: this.name,
+  });
+
+  if (isSemesterExists) {
+    throw new Error('Semester is already exists !');
+  }
+  next();
+});
+```
+
+- not common for all works are made in service
+
+```ts
+import { TAcademicSemester } from './academicSemester.interface';
+import { AcademicSemester } from './academicSemester.model';
+
+const createAcademicSemesterIntoDB = async (payload: TAcademicSemester) => {
+  // semester ---> semester code
+  //   type TAcademicSemesterNameCodeMapper = {
+  //     Autumn: '01',
+  //     Summer: '02',
+  //     Fall: 'O3',
+  //   }
+
+  //   using map types as new semester may come un upcoming days
+
+  //    as this is not common for all works so its made in service
+  // if it is a common work it might be in model
+  type TAcademicSemesterNameCodeMapper = {
+    [key: string]: string;
+  };
+  const academicSemesterNameCodeMapper: TAcademicSemesterNameCodeMapper = {
+    Autumn: '01',
+    Summer: '02',
+    Fall: 'O3',
+  };
+
+  //   academicSemesterNameCodeMapper[Fall] this is 03 and matches with the value of the payload.code
+  if (academicSemesterNameCodeMapper[payload.name] !== payload.code) {
+    throw new Error('Invalid Semester Code');
+  }
+  const result = await AcademicSemester.create(payload);
+  return result;
+};
+
+export const AcademicSemesterServices = {
+  createAcademicSemesterIntoDB,
+};
+```
