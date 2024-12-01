@@ -161,3 +161,7 @@ export const studentValidationSchema = z.object({
 ```
 
 - Though we will make separate middleware for this
+
+## 12-4 Create Academic Semester Interface
+
+![alt text](image-1.png)
